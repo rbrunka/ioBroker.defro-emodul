@@ -1,0 +1,9 @@
+{
+    "Options": "Опции",
+    "User ID": "ID пользователя",
+    "Enter your user ID": "Введите свой идентификатор пользователя",
+    "Token": "Токен",
+    "Enter your generated token": "Введите сгенерированный токен",
+    "Boiler UDID": "UDID котла",
+    "Enter your boiler UDID": "Введите UDID вашего котла"
+}

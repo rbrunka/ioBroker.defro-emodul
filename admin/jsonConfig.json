@@ -1,0 +1,38 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "_options": {
+            "type": "pannel",
+            "label": "Options",
+            "items": {
+                "userId": {
+                    "type": "text",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "User ID",
+                    "help": "Enter your user ID"
+                },
+                "token": {
+                    "newLine": true,
+                    "type": "text",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "Token",
+                    "help": "Enter your generated token"
+                },
+                "boilerUdid": {
+                    "newLine": true,
+                    "type": "text",
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "label": "Boiler UDID",
+                    "help": "Enter your boiler UDID"
+                }
+            }
+        }
+    }
+}
