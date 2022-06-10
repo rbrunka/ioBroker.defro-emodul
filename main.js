@@ -7,6 +7,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
+const axios = require('axios');
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -39,53 +40,98 @@ class DefroEmodul extends utils.Adapter {
 
         // The adapters config (in the instance object everything under the attribute "native") is accessible via
         // this.config:
-        this.log.info('config option1: ' + this.config.option1);
-        this.log.info('config option2: ' + this.config.option2);
+        this.log.info('config userID: ' + this.config.userId);
+        this.log.info('config token: ' + this.config.token);
+        this.log.info('config boiler UDID: ' + this.config.boilerUdid);
 
-        /*
-        For every state in the system there has to be also an object of type state
-        Here a simple template for a boolean variable named "testVariable"
-        Because every adapter instance uses its own unique namespace variable names can't collide with other adapters variables
-        */
-        await this.setObjectNotExistsAsync('testVariable', {
+        const self = this;
+
+        // read config
+        const defroUserID = this.config.userId;
+        const defroToken = this.config.token;
+        const defroUDID = this.config.boilerUdid;
+
+        // log config
+        this.log.info('UserID: ' + defroUserID);
+        this.log.info('Token: ' + defroToken);
+        this.log.info('Token: ' + defroUDID);
+
+        // create JSON data point
+        await this.setObjectNotExistsAsync('JSON', {
             type: 'state',
             common: {
-                name: 'testVariable',
-                type: 'boolean',
-                role: 'indicator',
+                name: 'JSON',
+                type: 'string',
+                role: 'text',
                 read: true,
                 write: true,
             },
             native: {},
         });
 
-        // In order to get state updates, you need to subscribe to them. The following line adds a subscription for our variable we have created above.
-        this.subscribeStates('testVariable');
-        // You can also add a subscription for multiple states. The following line watches all states starting with "lights."
-        // this.subscribeStates('lights.*');
-        // Or, if you really must, you can also watch all states. Don't do this if you don't need to. Otherwise this will cause a lot of unnecessary load on the system:
-        // this.subscribeStates('*');
+        // get data from API
+        await axios({
+            method: 'get',
+            baseURL: 'https://emodul.eu/api/v1/users/',
+            url: defroUserID + '/modules/' + defroUDID,
+            headers: { Authorization: 'Bearer ' + defroToken },
+            responseType: 'json'
+        }).then(function (response){
+            // log and store received data
+            self.log.info('received data (' + response.status + '): ' + JSON.stringify(response.data));
+            if (response.status !== 200) {
+                self.log.error('Error');
+            }
+            else
+            {
+                self.setState('JSON', {val: JSON.stringify(response.data)}, true);
+                // convert JSON to datapoints
+                const jsonResponse = response.data.tiles;
 
-        /*
-            setState examples
-            you will notice that each setState will cause the stateChange event to fire (because of above subscribeStates cmd)
-        */
-        // the variable testVariable is set to true as command (ack=false)
-        await this.setStateAsync('testVariable', true);
+                var key, subkey, objectID;
+                for (let i=0; i<jsonResponse.length; i++) {
+                    objectID = jsonResponse[i].id;
+                    for (key in jsonResponse[i]) {
+                        if (jsonResponse[i].hasOwnProperty(key)) {
+                            if (key == 'params')
+                            {
+                                for (subkey in jsonResponse[i][key]) {
+                                    if (jsonResponse[i][key].hasOwnProperty(subkey)) {
+                                        self.setObjectNotExistsAsync('data.' + objectID + '.' + key + '.' + subkey, {
+                                            type: 'state',
+                                            common: {
+                                                name: key,
+                                                type: 'string',
+                                                role: 'text',
+                                                read: true,
+                                                write: true,
+                                            },
+                                            native: {},
+                                        });
+                                        self.setState('data.' + objectID + '.' + key + '.' + subkey, {val: jsonResponse[i][key][subkey], ack: true});
+                                    }
+                                }
+                            } else {
+                                self.setObjectNotExistsAsync('data.'+ objectID +'.' + key, {
+                                    type: 'state',
+                                    common: {
+                                        name: key,
+                                        type: 'string',
+                                        role: 'text',
+                                        read: true,
+                                        write: true,
+                                    },
+                                    native: {},
+                                });
+                                self.setState('data.' + objectID + '.' + key, {val: jsonResponse[i][key], ack: true});
+                            }
+                        }
+                    }
+                }
+            };
+        });
 
-        // same thing, but the value is flagged "ack"
-        // ack should be always set to true if the value is received from or acknowledged from the target system
-        await this.setStateAsync('testVariable', { val: true, ack: true });
-
-        // same thing, but the state is deleted after 30s (getState will return null afterwards)
-        await this.setStateAsync('testVariable', { val: true, ack: true, expire: 30 });
-
-        // examples for the checkPassword/checkGroup functions
-        let result = await this.checkPasswordAsync('admin', 'iobroker');
-        this.log.info('check user admin pw iobroker: ' + result);
-
-        result = await this.checkGroupAsync('admin', 'admin');
-        this.log.info('check group user admin group admin: ' + result);
+        this.killTimeout = setTimeout(this.stop.bind(this), 10000);
     }
 
     /**
