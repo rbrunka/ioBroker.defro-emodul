@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.1",
+        "version": "0.0.3",
         "news": {
+            "0.0.3": {
+                "en": "first working tests",
+                "de": "erste arbeitsprüfungen",
+                "ru": "первые рабочие тесты",
+                "pt": "primeiros testes de trabalho",
+                "nl": "eerste werkende testen",
+                "fr": "premiers essais",
+                "it": "primo test di lavoro",
+                "es": "primera prueba de trabajo",
+                "pl": "testy pierwszej pracy",
+                "zh-cn": "第一次工作试验"
+            },
             "0.0.1": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
