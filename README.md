@@ -13,10 +13,12 @@
 
 ## defro-emodul adapter for ioBroker
 
-Integrate Defro boiler
+(en) Integrate Defro boiler
+(pl) Integracja z kotłem Defro
 
 ## Developer manual
-This section is intended for the developer. It can be deleted later
+(en) This is the development version. Do not install this adapter yet.
+(pl) To jest wersja deweloperska. Nie instaluj jeszcze tego adaptera.
 
 ### Getting started
 
