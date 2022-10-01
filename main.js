@@ -8,6 +8,7 @@
 // you need to create an adapter
 const utils = require('@iobroker/adapter-core');
 const axios = require('axios');
+const { url } = require('inspector');
 
 // Load your modules here, e.g.:
 // const fs = require("fs");
@@ -22,8 +23,12 @@ class DefroEmodul extends utils.Adapter {
             ...options,
             name: 'defro-emodul',
         });
+
+        this.emodulApiClient = null;
+        this.refreshStateTimeout = null;
+
         this.on('ready', this.onReady.bind(this));
-        this.on('stateChange', this.onStateChange.bind(this));
+        //this.on('stateChange', this.onStateChange.bind(this));
         // this.on('objectChange', this.onObjectChange.bind(this));
         // this.on('message', this.onMessage.bind(this));
         this.on('unload', this.onUnload.bind(this));
@@ -35,28 +40,92 @@ class DefroEmodul extends utils.Adapter {
     async onReady() {
         // Initialize your adapter here
 
-        // Reset the connection indicator during startup
-        this.setState('info.connection', false, true);
-
         // The adapters config (in the instance object everything under the attribute "native") is accessible via
         // this.config:
+        if (!this.config.userId) {
+            this.log.error(`User ID is empty - please check instance configuration of ${this.namespace}`);
+            return;
+        }
+        if (!this.config.token) {
+            this.log.error(`Token is empty - please check instance configuration of ${this.namespace}`);
+            return;
+        }
+        if (!this.config.boilerUdid) {
+            this.log.error(`Boiler UDID is empty - please check instance configuration of ${this.namespace}`);
+            return;
+        }
+
+        await this.setApiConnection(false);
+
+
         this.log.info('config userID: ' + this.config.userId);
         this.log.info('config token: ' + this.config.token);
         this.log.info('config boiler UDID: ' + this.config.boilerUdid);
-
-        const self = this;
 
         // read config
         const defroUserID = this.config.userId;
         const defroToken = this.config.token;
         const defroUDID = this.config.boilerUdid;
 
-        // log config
-        this.log.info('UserID: ' + defroUserID);
-        this.log.info('Token: ' + defroToken);
-        this.log.info('Token: ' + defroUDID);
+        this.emodulApiClient = axios.create({
+            method: 'get',
+            baseURL: 'https://emodul.eu/api/v1/users/',
+            headers: { Authorization: 'Bearer ' + defroToken },
+            responseType: 'json',
+            responseEncoding: 'utf8',
+            timeout: 1000,
+            validateStatus: (status) => {
+                return [200, 201, 401].includes(status);
+            },
+        });
 
-        // create JSON data point
+        const defroUrl = defroUserID + '/modules/' + defroUDID;
+        await this.refreshState(defroUrl);
+        await this.subscribeStatesAsync('*');
+    }
+
+    async refreshState(defroUrl) {
+        let nextRefreshSec = 60;
+
+        try {
+            const deviceInfoResponse = await this.emodulApiClient.get(defroUrl);;
+            this.log.debug(`deviceInfoResponse ${deviceInfoResponse.status}: ${JSON.stringify(deviceInfoResponse.data)}`);
+
+            if (deviceInfoResponse.status == 200) {
+                const deviceData = deviceInfoResponse.data;
+                //console.log(deviceData);
+                await this.setApiConnection(true);
+                this.log.debug(`deviceDara: ${JSON.stringify(deviceData)}`);
+                this.setState('JSON', {val: JSON.stringify(deviceData)}, true);
+            }
+        } catch (error) {
+            // Set device offline
+            await this.setApiConnection(false);
+
+            if (error.name === 'AxiosError') {
+                this.log.error(`Request to ${error.config.url} failed with code ${error.status} (${error.code}): ${error.message}`);
+                this.log.debug(`Complete error object: ${JSON.stringify(err)}`);
+            } else {
+                this.log.error(error);
+            }
+        } finally {
+            if (this.refreshStateTimeout) {
+                this.clearTimeout(this.refreshStateTimeout);
+            }
+
+            this.refreshStateTimeout = this.setTimeout(() => {
+                this.refreshStateTimeout = null;
+                this.refreshState(defroUrl);
+            }, nextRefreshSec * 1000);
+            this.log.debug(`refreshStateTimeout: re-created refresh timeout: id ${this.refreshStateTimeout}`);
+        }
+    }
+
+    async setApiConnection(status) {
+        await this.setStateAsync('info.connection', { val: status, ack: true });
+    }
+
+/*         // create JSON data point
         await this.setObjectNotExistsAsync('JSON', {
             type: 'state',
             common: {
@@ -130,9 +199,9 @@ class DefroEmodul extends utils.Adapter {
                 }
             };
         });
+ */
+        //this.killTimeout = setTimeout(this.stop.bind(this), 10000);
 
-        this.killTimeout = setTimeout(this.stop.bind(this), 10000);
-    }
 
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -145,6 +214,7 @@ class DefroEmodul extends utils.Adapter {
             // clearTimeout(timeout2);
             // ...
             // clearInterval(interval1);
+            this.setStateAsync('info.connection', { val: false, ack: true });
 
             callback();
         } catch (e) {
