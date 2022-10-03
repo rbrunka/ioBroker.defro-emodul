@@ -57,10 +57,9 @@ class DefroEmodul extends utils.Adapter {
 
         await this.setApiConnection(false);
 
-
-        this.log.info('config userID: ' + this.config.userId);
-        this.log.info('config token: ' + this.config.token);
-        this.log.info('config boiler UDID: ' + this.config.boilerUdid);
+        this.log.debug('config userID: ' + this.config.userId);
+        this.log.debug('config token: ' + this.config.token);
+        this.log.debug('config boiler UDID: ' + this.config.boilerUdid);
 
         // read config
         const defroUserID = this.config.userId;
@@ -95,7 +94,7 @@ class DefroEmodul extends utils.Adapter {
                 const deviceData = deviceInfoResponse.data;
                 //console.log(deviceData);
                 await this.setApiConnection(true);
-                this.log.debug(`deviceDara: ${JSON.stringify(deviceData)}`);
+                this.log.debug(`deviceData: ${JSON.stringify(deviceData)}`);
                 this.setState('JSON', {val: JSON.stringify(deviceData)}, true);
             }
         } catch (error) {

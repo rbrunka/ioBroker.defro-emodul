@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.5",
+        "version": "0.0.6",
         "news": {
-	    "0.0.5": {
+	    "0.0.6": {
                 "en": "data will be stored in a JSON object",
                 "de": "daten werden in einem JSON-Objekt gespeichert",
                 "ru": "данные будут храниться в объекте JSON",
@@ -128,6 +128,19 @@
                 "def": false
             },
             "native": {}
-        }
+        },
+        {
+	    "_id": "JSON",
+	    "type": "state",
+	    "common": {
+                "role": "state",
+		"name": "JSON",
+		"type": "string",
+		"read": true,
+		"write": false,
+		"def": false
+	    },
+	    "native": {}
+	}
     ]
 }
