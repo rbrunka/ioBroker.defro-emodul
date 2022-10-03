@@ -1,8 +1,20 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.3",
+        "version": "0.0.4",
         "news": {
+	    "0.0.4": {
+                "en": "data will be stored in a JSON object",
+                "de": "daten werden in einem JSON-Objekt gespeichert",
+                "ru": "данные будут храниться в объекте JSON",
+                "pt": "os dados serão armazenados em um objeto JSON",
+                "nl": "data zal worden opgeslagen in een JSON object",
+                "fr": "les données seront stockées dans un objet JSON",
+                "it": "i dati verranno memorizzati in un oggetto JSON",
+                "es": "los datos se almacenarán en un objeto JSON",
+                "pl": "dane będą przechowywane w obiektach JSON",
+                "zh-cn": "数据将存入联合材料处的物体"
+            },
             "0.0.3": {
                 "en": "first working tests",
                 "de": "erste arbeitsprüfungen",
