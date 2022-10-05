@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.6",
+        "version": "0.0.8",
         "news": {
-	    "0.0.6": {
+	    "0.0.8": {
                 "en": "data will be stored in a JSON object",
                 "de": "daten werden in einem JSON-Objekt gespeichert",
                 "ru": "данные будут храниться в объекте JSON",
@@ -40,7 +40,6 @@
                 "zh-cn": "首次出版"
             }
         },
-        "title": "Defro Boiler via emodul",
         "titleLang": {
             "en": "Defro Boiler via emodul",
             "de": "Defro Boiler über Emodul",
