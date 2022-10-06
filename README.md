@@ -27,7 +27,7 @@
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 0.0.12 (2022-10-06)
 * (Roman Brunka) correcting io-package.json
 
 ### 0.0.6 (2022-10-03)
