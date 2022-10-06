@@ -1,6 +1,6 @@
 {
   "name": "iobroker.defro-emodul",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "Integrate Defro boiler",
   "author": {
     "name": "Roman Brunka",
