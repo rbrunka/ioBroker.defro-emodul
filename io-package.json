@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.10",
+        "version": "0.0.12",
         "news": {
-	    "0.0.10": {
+	    "0.0.12": {
                 "en": "data will be stored in a JSON object",
                 "de": "daten werden in einem JSON-Objekt gespeichert",
                 "ru": "данные будут храниться в объекте JSON",
