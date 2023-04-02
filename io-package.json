@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "defro-emodul",
-        "version": "0.0.12",
+        "version": "0.0.13",
         "news": {
-	    "0.0.12": {
+	    "0.0.13": {
                 "en": "data will be stored in a JSON object",
                 "de": "daten werden in einem JSON-Objekt gespeichert",
                 "ru": "данные будут храниться в объекте JSON",
@@ -79,7 +79,8 @@
         "extIcon": "https://raw.githubusercontent.com/rbrunka/ioBroker.defro-emodul/main/admin/defro-emodul.png",
         "readme": "https://github.com/rbrunka/ioBroker.defro-emodul/blob/main/README.md",
         "loglevel": "info",
-        "mode": "daemon",
+        "mode": "schedule",
+        "schedule": "* * * * *",
         "type": "climate-control",
         "compact": true,
         "connectionType": "cloud",
@@ -116,30 +117,17 @@
             "native": {}
         },
         {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        },
-        {
-	    "_id": "JSON",
-	    "type": "state",
-	    "common": {
-                "role": "state",
-		"name": "JSON",
-		"type": "string",
-		"read": true,
-		"write": false,
-		"def": false
-	    },
-	    "native": {}
-	}
+	        "_id": "JSON",
+	        "type": "state",
+	        "common": {
+                    "role": "state",
+		    "name": "JSON",
+		    "type": "string",
+		    "read": true,
+		    "write": false,
+		    "def": false
+	        },
+	        "native": {}
+	    }
     ]
 }
