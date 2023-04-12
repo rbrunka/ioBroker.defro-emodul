@@ -17,8 +17,8 @@
 (pl) Integracja z kotłem Defro
 
 ## Developer manual
-(en) This is the development version. Do not install this adapter yet.
-(pl) To jest wersja deweloperska. Nie instaluj jeszcze tego adaptera.
+(en) This is the development version. You can install and test it.
+(pl) To jest wersja deweloperska. Możesz ją zainstalować i testować.
 
 API interface documentation: https://emodul.eu/docs/api-v1.txt
 
