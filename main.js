@@ -69,11 +69,13 @@ class DefroEmodul extends utils.Adapter {
         } finally {
             this.stop();
         }
+
+        this.killTimeout = setTimeout(this.stop.bind(this), 10000);
     }
 
     async refreshState(defroUrl) {
         try {
-            const deviceInfoResponse = await this.emodulApiClient.get(defroUrl);;
+            const deviceInfoResponse = await this.emodulApiClient.get(defroUrl);
             this.log.debug(`deviceInfoResponse ${deviceInfoResponse.status}: ${JSON.stringify(deviceInfoResponse.data)}`);
 
             if (deviceInfoResponse.status == 200) {
@@ -81,6 +83,7 @@ class DefroEmodul extends utils.Adapter {
                 //console.log(deviceData);
                 this.log.debug(`deviceData: ${JSON.stringify(deviceData)}`);
                 this.setState('JSON', {val: JSON.stringify(deviceData)}, true);
+                this.setDatapoints(deviceData);
             }
         } catch (error) {
             // Set device offline
@@ -93,63 +96,19 @@ class DefroEmodul extends utils.Adapter {
         }
     }
 
-/*         // create JSON data point
-        await this.setObjectNotExistsAsync('JSON', {
-            type: 'state',
-            common: {
-                name: 'JSON',
-                type: 'string',
-                role: 'text',
-                read: true,
-                write: true,
-            },
-            native: {},
-        });
-
-        // get data from API
-        await axios({
-            method: 'get',
-            baseURL: 'https://emodul.eu/api/v1/users/',
-            url: defroUserID + '/modules/' + defroUDID,
-            headers: { Authorization: 'Bearer ' + defroToken },
-            responseType: 'json'
-        }).then(function (response){
-            // log and store received data
-            self.log.info('received data (' + response.status + '): ' + JSON.stringify(response.data));
-            if (response.status !== 200) {
-                self.log.error('Error');
-            }
-            else
-            {
-                self.setState('JSON', {val: JSON.stringify(response.data)}, true);
-                // convert JSON to datapoints
-                const jsonResponse = response.data.tiles;
-
-                var key, subkey, objectID;
-                for (let i=0; i<jsonResponse.length; i++) {
-                    objectID = jsonResponse[i].id;
-                    for (key in jsonResponse[i]) {
-                        if (jsonResponse[i].hasOwnProperty(key)) {
-                            if (key == 'params')
-                            {
-                                for (subkey in jsonResponse[i][key]) {
-                                    if (jsonResponse[i][key].hasOwnProperty(subkey)) {
-                                        self.setObjectNotExistsAsync('data.' + objectID + '.' + key + '.' + subkey, {
-                                            type: 'state',
-                                            common: {
-                                                name: key,
-                                                type: 'string',
-                                                role: 'text',
-                                                read: true,
-                                                write: true,
-                                            },
-                                            native: {},
-                                        });
-                                        self.setState('data.' + objectID + '.' + key + '.' + subkey, {val: jsonResponse[i][key][subkey], ack: true});
-                                    }
-                                }
-                            } else {
-                                self.setObjectNotExistsAsync('data.'+ objectID +'.' + key, {
+    async setDatapoints(deviceData) {
+        // from object tiles to datapoints
+        const jsonResponse = deviceData.tiles;
+        var key, subkey, objectID;
+        for (let i=0; i<jsonResponse.length; i++) {
+            objectID = jsonResponse[i].id;
+            for (key in jsonResponse[i]) {
+                if (jsonResponse[i].hasOwnProperty(key)) {
+                    if (key == 'params')
+                    {
+                        for (subkey in jsonResponse[i][key]) {
+                            if (jsonResponse[i][key].hasOwnProperty(subkey)) {
+                                this.setObjectNotExistsAsync('data.' + objectID + '.' + key + '.' + subkey, {
                                     type: 'state',
                                     common: {
                                         name: key,
@@ -160,16 +119,27 @@ class DefroEmodul extends utils.Adapter {
                                     },
                                     native: {},
                                 });
-                                self.setState('data.' + objectID + '.' + key, {val: jsonResponse[i][key], ack: true});
+                                this.setState('data.' + objectID + '.' + key + '.' + subkey, {val: jsonResponse[i][key][subkey], ack: true});
                             }
                         }
+                    } else {
+                        this.setObjectNotExistsAsync('data.'+ objectID +'.' + key, {
+                            type: 'state',
+                            common: {
+                                name: key,
+                                type: 'string',
+                                role: 'text',
+                                read: true,
+                                write: true,
+                            },
+                            native: {},
+                        });
+                        this.setState('data.' + objectID + '.' + key, {val: jsonResponse[i][key], ack: true});
                     }
                 }
-            };
-        });
- */
-        //this.killTimeout = setTimeout(this.stop.bind(this), 10000);
-
+            }
+        }
+    }
 
     /**
      * Is called when adapter shuts down - callback has to be called under any circumstances!
