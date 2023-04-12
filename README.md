@@ -20,6 +20,8 @@
 (en) This is the development version. Do not install this adapter yet.
 (pl) To jest wersja deweloperska. Nie instaluj jeszcze tego adaptera.
 
+API interface documentation: https://emodul.eu/docs/api-v1.txt
+
 ### Getting started
 
 ## Changelog
@@ -27,6 +29,8 @@
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### 0.0.13 (2022-04-12)
+* (Roman Brunka) changing daemon to cron job
 ### 0.0.12 (2022-10-06)
 * (Roman Brunka) correcting io-package.json
 
